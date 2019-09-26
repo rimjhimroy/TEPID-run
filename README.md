@@ -1,7 +1,7 @@
 # TEPID-run
 The Scripts were run using IBM LSF HPC cluster. Needs to be adapted according to the type of cluster.
 
-## Create Yaha and Bowtie index
+**Create Yaha and Bowtie index**  
 yaha -g refgenome.fasta -L 11 -H 2000
 bowtie -f refgenome.fasta --threads 5 refgenome
 
