@@ -1,0 +1,68 @@
+#!/bin/bash
+#BSUB -J "TEPID[1-305]%24" 
+#BSUB -R "rusage[mem=2000]" 
+#BSUB -n 1 
+#BSUB -W 4:00 
+#BSUB -o log.%J.%I 
+#BSUB -e err.%J.%I 
+
+# !!! make sure the group "USYS-IBZ-GDC-EULER-p304" is avaible
+# run below newgrp command on the command line before submitting this script
+# newgrp USYS-IBZ-GDC-EULER-p304
+
+# load the modules 
+module load gcc/4.8.2 gdc bowtie2/2.2.6 yaha/0.1.83 perl/5.18.4 samblaster/0.1.22 bedtools/2.25 samtools/1.3 picard-tools/2.0.1 java/1.8.0_91
+
+#Set all the path for required directories and files
+#X=/cluster/project/gdc/people/crimjhim/TEPID/Aalpina10kb
+#Y=/cluster/project/gdc/people/crimjhim/TEPID/Aalpina10kb.X11_01_02000S
+
+
+#TEP=/cluster/scratch/crimjhim/TEPID_map/
+TEP=/cluster/scratch/crimjhim/TEPID_refine/
+
+
+#READ=/cluster/project/gdc/shared/p304/Ma.Es.Pi.Pa_fastq.files
+#GFF=/cluster/project/gdc/people/crimjhim/TEPID_final.insertion.bed.sort
+
+# create output directory if it does not exist
+#if [ ! -e $TEP ]
+#then
+#	mkdir $TEP
+#fi
+cd $TEP
+
+# create list with fwd read names 
+#if [ ! -e read1.list ]
+#then
+#	ls -1 $READ/*uniq1.fastq* > read1.list
+#fi
+
+# for each parallel job use the corresponding read name from the read list
+# e.g., for job 23 use read name on line 23
+IDX=$LSB_JOBINDEX
+R1=`sed -n ${IDX}p <read1.list`
+#R2=`echo $R1 | sed 's/uniq1/uniq2/'`
+
+# extract sample name, create and enter directory
+sample=`basename "$R1"`
+echo "sample: $sample"
+#mkdir $sample
+cd $sample
+reads="${sample}.reads"
+bam="${sample}.bam"
+echo "bam: $bam"
+output="${sample}.split1.bam"
+out="${sample}.out"
+# Extract the number of reads that are split or discordant 
+samtools view  -F 2  "/cluster/project/gdc/people/crimjhim/TEPIDV5.1/$sample/$bam" | cut -f 1 > out.1
+
+samtools view  -f4  "/cluster/project/gdc/people/crimjhim/TEPIDV5.1/$sample/$bam" | cut -f 1 >> out.1
+samtools view -F4 "/cluster/project/gdc/people/crimjhim/TEPIDV5.1/$sample/$bam" |  awk '$6 ~ /S/ || $6 ~ /H/' | cut -f1 >> out.1
+picard FilterSamReads I="/cluster/project/gdc/people/crimjhim/TEPIDV5.1/$sample/$bam" O=$output READ_LIST_FILE=out.1 FILTER=includeReadList
+# Return back to reads directory
+rm out.1
+rm $reads
+cd $TEP
+
+
