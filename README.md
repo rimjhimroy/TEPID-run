@@ -1,7 +1,7 @@
 # TEPID-run
 The Scripts were run using IBM LSF HPC cluster. Needs to be adapted according to the type of cluster.
 
-### Scripts to run TEPID
+### 01. Scripts to run TEPID
 **Create Yaha and Bowtie index**  
 yaha -g refgenome.fasta -L 11 -H 2000
 bowtie -f refgenome.fasta --threads 5 refgenome
@@ -29,7 +29,7 @@ merge_deletions.py -f deletions
 
 flip the genotyped deletion file and concatenate with genotyped insertion file
 
-### Reformat polyTEs
+### 02. Reformat polyTEs
 Reformats the genotyping output from genotype.py in TEPID as a matrix with some classification of the loci (which I did not use)
 
 To run the reformat_tepav_matrix_del.py first flip the genotyped deletion calls, making called samples as absence (0) and no calls as presence (1).
