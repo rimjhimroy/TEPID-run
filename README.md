@@ -3,7 +3,7 @@ The Scripts were run using IBM LSF HPC cluster. Needs to be adapted according to
 
 ### 01. Scripts to run TEPID
 **Create Yaha and Bowtie index**  
-yaha -g refgenome.fasta -L 11 -H 2000
+yaha -g refgenome.fasta -L 11 -H 2000  
 bowtie -f refgenome.fasta --threads 5 refgenome
 
 **Step1:** Run TEPID_map using submit.tepid-map.lsf  
